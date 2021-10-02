@@ -13,6 +13,10 @@
             <td>タスク</td>
             <td>{{ $task->content }}</td>
         </tr>
+        <tr>
+            <td>ステータス</td>
+            <td>{{ $task->status }}</td>
+        </tr>
     </table>
     
     {{-- タスク編集ページへのリンク --}}
