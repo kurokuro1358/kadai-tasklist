@@ -19,6 +19,11 @@ Route::get('/', function(){
 Route::get('signup', 'Auth\RegsterController@showRegistrationForm')->name('signup.get');
 Route::post('signup', 'Auth|RegsterController@register')->name('signup.post');
 
+// 認証
+Route::get('login', 'Auth\LoginController@showLoginForm')->name('login.get');
+Route::post('login', 'Auth\LoginController@login')->name('login.post');
+Route::get('logout', 'Auth\LoginController@logout')->name('logout.get');
+
 Route::get('/', 'TasksController@index');
 
 Route::resource('tasks', 'TasksController');
