@@ -79,8 +79,6 @@ class TasksController extends Controller
     public function show($id)
     {
         
-        // dd($id);
-        
         // idの値でタスクを検索して取得
         $task = Task::find($id);
         if ($task == null){
@@ -113,7 +111,21 @@ class TasksController extends Controller
     public function edit($id)
     {
         // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
+        if ($task == null){
+            return redirect('/');
+        }
+        
+        //////////////////////////////////////////////////////////////
+        // タスクIDが自分のIDであるかどうか？をチェックする処理を追加
+        //////////////////////////////////////////////////////////////
+        $user = \Auth::user();
+        $result = false;
+        $result = $user->tasks()->find($id);
+
+        if (!$result){
+            return redirect('/');
+        }
         
         // タスク編集ビューでそれを表示
         return view('tasks.edit', [
