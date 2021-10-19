@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Task;
+use App\User;
 
 class TasksController extends Controller
 {
@@ -15,13 +16,19 @@ class TasksController extends Controller
      */
     public function index()
     {
-        // タスク一覧を取得
-        $tasks = Task::all();
-        
-        // タスク一覧ビューでそれを表示
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+        $data = [];
+        if(\Auth::check()){ // 認証済みの場合
+            // 認証済みユーザを取得
+            $user = \Auth::user();
+            // ユーザのタスクを作成日時の降順で取得
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+            
+            // Welcomeビューでそれらを表示
+            return view('tasks.index', [
+                'tasks' => $tasks
+            ]);
+        }
+        else return view('welcome');
     }
 
     /**
@@ -53,14 +60,14 @@ class TasksController extends Controller
             'status' => 'required|max:10',
         ]);
         
-        // タスクを作成
-        $task = new Task;
-        $task->content = $request->content;
-        $task->status = $request->status;
-        $task->save();
+        // 認証済みユーザのタスクとして作成
+        $request->user()->tasks()->create([
+            'content' => $request->content,
+            'status' => $request->status,
+        ]);
         
-        // トップページへリダイレクトさせる
-        return redirect('/');
+        // 前のURLへリダイレクトさせる
+        return redirect('tasks');
     }
 
     /**
@@ -71,15 +78,32 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
         
-        // タスク詳細ビューでそれを表示
+        // dd($id);
+        
+        // idの値でタスクを検索して取得
+        $task = Task::find($id);
+        if ($task == null){
+            return redirect('/');
+        }
+        
+        //////////////////////////////////////////////////////////////
+        // タスクIDが自分のIDであるかどうか？をチェックする処理を追加
+        //////////////////////////////////////////////////////////////
+        $user = \Auth::user();
+        $result = false;
+        $result = $user->tasks()->find($id);
+
+        if (!$result){
+            return redirect('/');
+        }
+        
+        // タスク詳細ビューでそれらを表示
         return view('tasks.show', [
+            // 'user' => $user,
             'task' => $task,
         ]);
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -132,11 +156,22 @@ class TasksController extends Controller
     public function destroy($id)
     {
         // idの値でタスクを検索して取得
-        $task = Task::findOrFail($id);
-        // タスクを削除
-        $task->delete();
+        $task = Task::find($id);
         
-        // トップページへリダイレクトさせる
-        return redirect('/');
+        //////////////////////////////////////////////////////////////
+        // タスクIDが自分のIDであるかどうか？をチェックする処理を追加
+        //////////////////////////////////////////////////////////////
+        $user = \Auth::user();
+        $result = false;
+        $result = $user->tasks()->find($id);
+
+        if (!$result){
+            return redirect('/');
+        } else{
+            $task->delete(); 
+        }
+        
+        // 前のURLへリダイレクトさせる
+        return back();
     }
 }

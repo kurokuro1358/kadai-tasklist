@@ -21,12 +21,12 @@
                 
                 <div class="form-group">
                     {!! Form::label('password', 'Password') !!}
-                    {!! Form::passwora('passwora', ['class' => 'form-contorl']) !!}
+                    {!! Form::password('password', ['class' => 'form-contorl']) !!}
                 </div>
                 
                 <div class="form-group">
                     {!! Form::label('password_confirmation', 'Confirmation') !!}
-                    {!! Form::text('password_confirmation', ['class' => 'form-contorl']) !!}
+                    {!! Form::password('password_confirmation', ['class' => 'form-contorl']) !!}
                 </div>
                 
                 {!! Form::submit('Sign up', ['class' => 'btn btn-primary btn-block']) !!}

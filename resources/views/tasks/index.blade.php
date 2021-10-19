@@ -24,6 +24,8 @@
                 @endforeach
             </tbody>
         </table>
+        {{-- ページネーション --}}
+        {{ $tasks->links() }}
     @endif
     
     {{-- タスク作成ページへのリンク --}}
